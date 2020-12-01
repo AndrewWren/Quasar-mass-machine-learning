@@ -3,7 +3,9 @@ __pycache__/**
 best_models_history/**
 data/bigger_data/**
 data/spectra/**
+Issues.txt
 latex/**
 
 !data/bigger_data/dummy.txt
+!data/bigger_data/quasars.parquet
 !data/spectra/dummy.txt
