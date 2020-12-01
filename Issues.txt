@@ -1,0 +1,5 @@
+- [x] @mentions, #refs, [links](), **formatting**, and <del>tags</del> supported
+- [ ] Allow pickle save and load
+- [ ] Tidy scripts into another folder
+- [ ] Can optimizer, esp. for second round, be improved?  E.g. note first epoch is the best.
+- [ ] Investigate pooling

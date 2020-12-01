@@ -7,7 +7,9 @@ The [Sloan Digital Sky Survey (SDSS)](https://www.sdss.org/) has observed an ext
 
 The code in this repository uses a subset of the Chen+ 2019 dataset to predict quasar black hole masses through an artificial neural network (ANN) implemented using Keras on Tensorflow2.  The ANN is loosely based on a model for SketchRNN presented by @ageron in his [solutions](https://github.com/ageron/handson-ml2) for Chapter 15 of [*Hands-on Machine Learning with Scikit-Learn, Keras and TensorFlow*](https://github.com/ageron/handson-ml2).  It predicts the log of the black hole mass, log<sub>10</sub>(*M*<sub>BH</sub>/M<sub>Sun</sub>), for each single spectrum in a selected subset of the Chen+ quasars.
 
-The ANN takes the Chen+ "single-epoch" mass estimates as the model's ground truth for training.  The ANN comprises three Conv1D layers (the middle one with a batch normalization) followed by two LSTM layers and then two Dense layers.  Two rounds of Nadam optimization are used, with learning rates of 1e-3 and 1e-5.
+The ANN takes the Chen+ "single-epoch" mass estimates as the model's ground truth for training.  (Apologies that *epoch* has distinct astrophysics and ML meanings - hopefully always obvious from the context.  ML epoch only noccurs in the monitor for runing the ANN.)
+
+The ANN comprises three Conv1D layers (the middle one with a batch normalization) followed by two LSTM layers and then two Dense layers.  Two rounds of Nadam optimization are used, with learning rates of 1e-3 and 1e-5.
 
 On the test set, this model gives an R<sup>2</sup> of 0.72.  Some quasars have been observed many times with ~70 spectra taken; for those, using the mean mass prediction gives a test set R<sup>2</sup> of 0.75.  Those R2 values correspond to standard errors of 0.24 and 0.22 respectively, which are comparable to, or less than, the estimated errors for the ground truth spectral fittings - see [McLure & Dunlop 2004](https://academic.oup.com/mnras/article/352/4/1390/1077457), [Vestergaard & Peterson 2006](https://iopscience.iop.org/article/10.1086/500572), [Shen+ 2011](https://iopscience.iop.org/article/10.1088/0067-0049/194/2/45).
 

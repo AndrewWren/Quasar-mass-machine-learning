@@ -20,12 +20,10 @@ from progressbar import progressbar
 DATA_PATH = os.path.join(os.path.dirname (__file__), 'data')
 BIGGER_DATA_PATH = os.path.join(DATA_PATH, 'bigger_data')
 SPECTRA_PATH = os.path.join(DATA_PATH, 'spectra')
-CHEN_DATA_FILE = os.path.join(DATA_PATH,
-                                              'apjsab41fet1_mrt.txt')
-SDSS_DATA_FILE = os.path.join(BIGGER_DATA_PATH,
-                                              'DR16Q_v4.fits')
-ML_DATA_FILE = os.path.join(BIGGER_DATA_PATH,
-                                            'Chen_spectra_v1.p')
+CHEN_DATA_FILE = os.path.join(DATA_PATH, 'apjsab41fet1_mrt.txt')
+SDSS_DATA_FILE = os.path.join(BIGGER_DATA_PATH, 'DR16Q_v4.fits')
+QUASARS_FILE = os.path.join(BIGGER_DATA_PATH, 'quasars.parquet')
+SPECTRA_FILE = os.path.join(BIGGER_DATA_PATH, 'spectra.parquet')
 COL_DICT_LIST = [('SDSS', (1, 18)), ('Plate', (20, 24)),
                 ('MJD',   (26, 30)),  ('Fiber', (32, 35)),
                 ('ZVI',   (37, 42)),
@@ -370,7 +368,29 @@ def create_spectra(quasars, insist_lower=INSIST_LOWER,
 def get_Chen_data(creating='Load'):
         
     def Xy(quasars, spectra):
+        
+        def save_quasars(quasars):
+            quasars_new = quasars.copy().drop(columns=['EPOCH_LIST'])
+            index = [idx for idx in quasars_new.index]
+            quasars_new.index = index
+            quasars_new.index.name = 'OBJECT'            
+            quasars_new['CHEN EPOCH'] = (quasars_new['CHEN EPOCH']
+                                        .apply(lambda epoch: epoch.name()))
+            quasars_new.to_parquet(path=QUASARS_FILE, engine='fastparquet',
+                                   compression=None)
 
+        def save_spectra(spectra):
+            mi = spectra.index
+            mi = pd.MultiIndex.from_tuples([(index[0],
+                                            index[1].name()) for index in mi],
+                                            names=mi.names)#['OBJECT', 'EPOCH'])
+            spectra_new = pd.DataFrame(spectra.copy().to_numpy(),
+                                       index=mi,
+                                       columns=[str(col) for col in
+                                                spectra.columns])
+            spectra_new.to_parquet(path=SPECTRA_FILE,
+                                   engine='fastparquet', compression=None)                                              
+            
         def objs_train_test_val(quasars, spectra):
             strata_bins = [0.5, 1.5, 2.5, 3.5, 60, np.inf]
             strata = np.digitize(quasars.loc[:, 'N_EPOCHS'], bins=strata_bins)
@@ -383,7 +403,7 @@ def get_Chen_data(creating='Load'):
             obj_train, obj_val = train_test_split(obj_full_train,
                                                   test_size=0.2/0.9,
                                                   stratify=strata,
-                                                  random_state=RANDOM_STATE + 1)
+                                                  random_state=RANDOM_STATE+1)
             return obj_train, obj_val, obj_test
 
 
@@ -418,23 +438,40 @@ def get_Chen_data(creating='Load'):
         following two command lines
         cd /mnt/c/Users/andre/OneDrive/Documents/SDSS_RM_ML/data/spectra
         wget -nv -r -nH --cut-dirs=8 -i Chen_spec_list.txt 
-        -B https://data.sdss.org/sas/dr16/eboss/spectro/redux/v5_13_0/spectra/lite/
+        -B https://data.sdss.org/sas/dr16/eboss/spectro/redux/v5_13_0/spectra/
+        lite/
         Ignore error messages on Ubuntu.""")
     elif creating == 'Create dataframes':
         quasars = create_quasars()
         #pkl.dump([quasars], open(os.path.join(DATA_PATH,
          #                                           "quas.p"),"wb"))
         quasars, spectra = create_spectra(quasars)
-        pkl.dump([quasars, spectra], open(ML_DATA_FILE,"wb"))       
+        save_quasars(quasars)
+        save_spectra(spectra)
+        #pkl.dump([quasars, spectra], open(ML_DATA_FILE,"wb"))       
     else:
         print('Loading quasars and spectra')
-        quasars, spectra = pkl.load(open(ML_DATA_FILE,"rb"))
+        quasars = pd.read_parquet(path=QUASARS_FILE)
+
+        """To avoid UserWarning: Non-categorical multi-index is likely brittle
+        warnings.warn("Non-categorical multi-index is likely brittle")
+        which means might fail with new versions:
+        """
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            spectra = pd.read_parquet(path=SPECTRA_FILE)
+        #quasars, spectra = pkl.load(open(ML_DATA_FILE,"rb"))
         #print('3\n', quasars.head())
 
     return Xy(quasars, spectra)
 
 
 # In[ ]:
+
+def load_a():
+    import pickle as pkl
+    ML_DATA_FILE = '\data\bigger_data\Chen_spectra_v1.p'
+    return pkl.load(open(os.path.join(BIGGER_DATA_PATH, 'Chen_spectra_v1.p'),"rb"))
 
 
 
