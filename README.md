@@ -11,9 +11,7 @@ The ANN takes the Chen+ "single-epoch" mass estimates as the model's ground trut
 
 The ANN comprises three Conv1D layers (the middle one with a batch normalization) followed by two LSTM layers and then two Dense layers.  Two rounds of Nadam optimization are used, with learning rates of 1e-3 and 1e-5.
 
-On the test set, this model gives an R<sup>2</sup> of 0.72.  Some quasars have been observed many times with ~70 spectra taken; for those, using the mean mass prediction gives a test set R<sup>2</sup> of 0.75.  Those R2 values correspond to standard errors of 0.24 and 0.22 respectively, which are comparable to, or less than, the estimated errors for the ground truth spectral fittings - see [McLure & Dunlop 2004](https://academic.oup.com/mnras/article/352/4/1390/1077457), [Vestergaard & Peterson 2006](https://iopscience.iop.org/article/10.1086/500572), [Shen+ 2011](https://iopscience.iop.org/article/10.1088/0067-0049/194/2/45).
-
-An issue for further investigation is whether machine learning predictions for quasars with multiple spectra can be improved with a method more sophisticated than taking the mean of the associated predictions - for example an ANN approach to pooling estimates. 
+On the test set, this model gives an R<sup>2</sup> of 0.72.  Some quasars have been observed many times with ~70 spectra taken; for those, using the mean mass prediction gives a test set R<sup>2</sup> of 0.75.  An issue for further investigation is whether machine learning predictions for quasars with multiple spectra can be improved with a method more sophisticated than taking the mean of the associated predictions - for example an ANN approach to pooling estimates. 
 
 The files and folders are as follows:
 - `Quasar_mass_ML.ipynb`, the main program file to run, a Jupyter iPython file;
