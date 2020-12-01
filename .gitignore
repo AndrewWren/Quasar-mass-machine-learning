@@ -1,0 +1,9 @@
+.ipynb_checkpoints/**
+__pycache__/**
+best_models_history/**
+data/bigger_data/**
+data/spectra/**
+latex/**
+
+!data/bigger_data/dummy.txt
+!data/spectra/dummy.txt
