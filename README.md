@@ -24,10 +24,10 @@ The files and folders are as follows:
      - `Best_ANN_intermediate_stage.h5` which has the intermediate weights from the 1e-3 learning rate model run; and
      - `Best_ANN_final_stage.h5` which is the <ins>model to use for prediction</ins>, having the final weights from the 1e-5 learning rate model run;
 - a `data` folder, containing:
-  - `apjsab41fet1_mrt.txt` which is the Chen+ data file from (https://iopscience.iop.org/0067-0049/244/2/36/suppdata/apjsab41fet1_mrt.txt);
+  - `apjsab41fet1_mrt.txt` which is the Chen+ data file from https://iopscience.iop.org/0067-0049/244/2/36/suppdata/apjsab41fet1_mrt.txt;
   - a 'bigger_data` folder containing:
      - `quasars.parquet` which is created from the Chen+ data file and SDSS data.
 
-Additional data is needed to run the model as a `spectra.parquet` file is too big to be on GitHub (2.4GB) and is stored on *Open Science Foundation* at (https://osf.io/6hbqx/).  Download this and add it to the `bigger_data` sub-folder.
+Additional data is needed to run the model as a `spectra.parquet` file is too big to be on GitHub (2.4GB) and is stored on *Open Science Foundation* at https://osf.io/6hbqx/.  Download this and add it to the `bigger_data` sub-folder.
 
-To create the `quasars.parquet` and `spectra.parquet` files from scratch, download to `bigger_data` an SDSS data file (https://data.sdss.org/sas/dr16/eboss/qso/DR16Q/DR16Q_v4.fits), which is described on the relevant [SDSS datamodel webpage](https://dr16.sdss.org/datamodel/files/BOSS_QSO/DR16Q/DR16Q_v4.html).  Follow instructions in the second cell of `Quasar_mass_ML.ipynb`.  Please note further steps of this process downloads around 7GB, taking about half a day to run with a standard laptop and internet connection.
+To create the `quasars.parquet` and `spectra.parquet` files from scratch, download to `bigger_data` an SDSS data file https://data.sdss.org/sas/dr16/eboss/qso/DR16Q/DR16Q_v4.fits, which is described on the relevant [SDSS datamodel webpage](https://dr16.sdss.org/datamodel/files/BOSS_QSO/DR16Q/DR16Q_v4.html).  Follow instructions in the second cell of `Quasar_mass_ML.ipynb`.  Please note further steps of this process downloads around 7GB, taking about half a day to run with a standard laptop and internet connection.
