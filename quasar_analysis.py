@@ -5,9 +5,10 @@ Created on Mon Nov 30 18:54:11 2020
 @author: andre
 """
 
+import matplotlib.pyplot as plt
 import numpy as np
-import os
 import pandas as pd
+from sklearn.metrics import mean_squared_error, r2_score
 
 
 
@@ -79,3 +80,37 @@ def model_mean_predict_bins(quasars, model, X, y, n_epoch_bin_edges,
     y_pred_obj = y_obj_mean_prediction(model, X)
     n_epoch_bin_table(quasars, y_obj, y_pred_obj, n_epoch_bin_edges,
                       title=False)
+    
+
+def residuals(description, tgt, predictions, alpha=0.4):
+
+    res = -tgt + predictions
+    w_space = 0.075
+    fig, axs = plt.subplots(1, 2, figsize = (4 + 12 + w_space, 12),
+                            gridspec_kw={'width_ratios': [3, 1],
+                                         'wspace': w_space}) 
+    for ax in axs.flat:
+        ax.label_outer()
+
+    axs[0].scatter(predictions, res, alpha=alpha)
+    axs[1].hist(res, #.astype(float),
+                orientation='horizontal',
+                density=True,
+                bins=200)
+    axs[0].set_aspect('equal')
+    axs[0].set_xlabel('\nPredicted', fontsize=14)
+    axs[0].set_ylabel('Residual', fontsize=14)
+    axs[1].set_xlabel('\nResidual\ndensity', fontsize=14)
+    axs[1].set_yticks(ticks=[])
+    axs[0].axhline(0, c='k')
+    axs[1].axhline(0, c='k')
+    rms = np.sqrt(mean_squared_error(tgt, predictions))
+    axs[0].axhline(rms, c='k', alpha=alpha, linestyle=':')
+    axs[0].axhline(-rms, c='k', alpha=alpha, linestyle=':')
+    axs[1].axhline(rms, c='k', alpha=alpha, linestyle=':')
+    axs[1].axhline(-rms, c='k', alpha=alpha, linestyle=':')
+    r2 = r2_score(tgt, predictions)
+    suptitle = (description
+                + f":     RMS error = {rms:.02f},     R2 score = {r2:.02f}")
+    plt.suptitle(suptitle, fontsize=20, y=0.92)
+    plt.show()
