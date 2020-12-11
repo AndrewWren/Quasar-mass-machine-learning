@@ -6,7 +6,6 @@
 import numpy as np
 import os
 import pandas as pd
-import pickle as pkl
 from scipy.interpolate import interp1d
 from sklearn.model_selection import train_test_split
 from time import sleep
@@ -213,11 +212,10 @@ def create_quasars():
 
 
 """Note that downloading the actual FITS spectra via Python is around 8 times slower than just using the wget in Ubuntu,
-so AFTER using the function below go to Ubuntu and issue the following two command lines:
-cd /mnt/c/Users/andre/OneDrive/Documents/SDSS_RM_ML/data/spectra
-wget -nv -r -nH --cut-dirs=8 -i Chen_spec_list.txt -B https://data.sdss.org/sas/dr16/eboss/spectro/redux/v5_13_0/spectra/lite/
+so AFTER using the function below go to Ubuntu and issue the following command lines from the main directory you have downloaded this repo to:
+cd ./data/spectra; wget -nv -r -nH --cut-dirs=8 -i Chen_spec_list.txt -B https://data.sdss.org/sas/dr16/eboss/spectro/redux/v5_13_0/spectra/lite/
 
-Ignore error messages on Ubuntu
+Ignore error messages on Ubuntu if the download works
 """
 
 def write_address_list(quasars):
@@ -340,10 +338,7 @@ def create_spectra(quasars, insist_lower=INSIST_LOWER,
     lw_upper = round(np.floor(lw_upper/SCALE)*SCALE, D_SCALE)
     x = np.arange(lw_lower, lw_upper, SCALE/2)
  
-    pkl.dump([lw_lower, lw_upper, spectra_list, indices],
-                open(ML_DATA_FILE,"wb"))
-    
-    
+   
     #print('Point 1')
     print('Transforming emitted spectra to standard wavelength grid')
     sleep(0.4)  #Stop the prints affecting the progressbar
@@ -359,37 +354,37 @@ def create_spectra(quasars, insist_lower=INSIST_LOWER,
     spectra = pd.DataFrame(ys, index=mi, columns=x, dtype='float64')
     assert spectra.isnull().sum().sum() == 0,                 "Error: spectra has a null element"
 
-    pkl.dump(spectra, open(ML_DATA_FILE,"wb"))
     return finalise_quasars(quasars, spectra), spectra
 
 # In[81]:
 
 
 def get_Chen_data(creating='Load'):
+ 
+    def save_quasars(quasars):
+        quasars_new = quasars.copy().drop(columns=['EPOCH_LIST'])
+        index = [idx for idx in quasars_new.index]
+        quasars_new.index = index
+        quasars_new.index.name = 'OBJECT'            
+        quasars_new['CHEN EPOCH'] = (quasars_new['CHEN EPOCH']
+                                    .apply(lambda epoch: epoch.name()))
+        quasars_new.to_parquet(path=QUASARS_FILE, engine='fastparquet',
+                               compression=None)
+
+    def save_spectra(spectra):
+        mi = spectra.index
+        mi = pd.MultiIndex.from_tuples([(index[0],
+                                        index[1].name()) for index in mi],
+                                        names=mi.names)#['OBJECT', 'EPOCH'])
+        spectra_new = pd.DataFrame(spectra.copy().to_numpy(),
+                                   index=mi,
+                                   columns=[str(col) for col in
+                                            spectra.columns])
+        spectra_new.to_parquet(path=SPECTRA_FILE,
+                               engine='fastparquet', compression=None)    
         
     def Xy(quasars, spectra):
-        
-        def save_quasars(quasars):
-            quasars_new = quasars.copy().drop(columns=['EPOCH_LIST'])
-            index = [idx for idx in quasars_new.index]
-            quasars_new.index = index
-            quasars_new.index.name = 'OBJECT'            
-            quasars_new['CHEN EPOCH'] = (quasars_new['CHEN EPOCH']
-                                        .apply(lambda epoch: epoch.name()))
-            quasars_new.to_parquet(path=QUASARS_FILE, engine='fastparquet',
-                                   compression=None)
 
-        def save_spectra(spectra):
-            mi = spectra.index
-            mi = pd.MultiIndex.from_tuples([(index[0],
-                                            index[1].name()) for index in mi],
-                                            names=mi.names)#['OBJECT', 'EPOCH'])
-            spectra_new = pd.DataFrame(spectra.copy().to_numpy(),
-                                       index=mi,
-                                       columns=[str(col) for col in
-                                                spectra.columns])
-            spectra_new.to_parquet(path=SPECTRA_FILE,
-                                   engine='fastparquet', compression=None)                                              
             
         def objs_train_test_val(quasars, spectra):
             strata_bins = [0.5, 1.5, 2.5, 3.5, 60, np.inf]
@@ -435,12 +430,14 @@ def get_Chen_data(creating='Load'):
         print("""Note that downloading the actual FITS spectra via Python is 
         around 8 times slower than just using the wget in Ubuntu,
         so AFTER using the function below go to Ubuntu and issue the
-        following two command lines
-        cd /mnt/c/Users/andre/OneDrive/Documents/SDSS_RM_ML/data/spectra
-        wget -nv -r -nH --cut-dirs=8 -i Chen_spec_list.txt 
-        -B https://data.sdss.org/sas/dr16/eboss/spectro/redux/v5_13_0/spectra/
-        lite/
-        Ignore error messages on Ubuntu.""")
+        following command line from the main directory to which the repo was
+        downloaded:
+        cd ./data/spectra; wget -nv -r -nH --cut-dirs=8 -i
+        Chen_spec_list.txt -B
+        https:
+        //data.sdss.org/sas/dr16/eboss/spectro/redux/v5_13_0/spectra/lite/
+
+        Ignore error messages on Ubuntu if the download works""")
     elif creating == 'Create dataframes':
         quasars = create_quasars()
         #pkl.dump([quasars], open(os.path.join(DATA_PATH,
@@ -465,13 +462,6 @@ def get_Chen_data(creating='Load'):
 
     return Xy(quasars, spectra)
 
-
-# In[ ]:
-
-def load_a():
-    import pickle as pkl
-    ML_DATA_FILE = '\data\bigger_data\Chen_spectra_v1.p'
-    return pkl.load(open(os.path.join(BIGGER_DATA_PATH, 'Chen_spectra_v1.p'),"rb"))
 
 
 
