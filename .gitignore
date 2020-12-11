@@ -4,6 +4,7 @@ best_models_history/**
 models/Checkpoints/**
 data/bigger_data/**
 data/spectra/**
+data/test/**
 Issues.txt
 latex/**
 
