@@ -74,11 +74,11 @@ class Epoch:
         self.fiber = state[2]
     
     def name(self):
-        return (str(self.plate).zfill(4) + '-' + str(self.mjd).zfill(5)
-                + '-' + str(self.fiber).zfill(4))
+        return(str(self.plate).zfill(4) + '-' + str(self.mjd).zfill(5)
+               + '-' + str(self.fiber).zfill(4))
     
     def web_address(self):
-        return self.name() + '.fits\n'
+        return(str(self.plate).zfill(4) + '/spec-' + self.name() + '.fits\n')
     
     def file_location(self):
         return(os.path.join(str(self.plate).zfill(4),
@@ -431,13 +431,13 @@ def get_Chen_data(creating='Load'):
         around 8 times slower than just using the wget in Ubuntu,
         so AFTER using the function below go to Ubuntu and issue the
         following command line from the main directory to which the repo was
-        downloaded:
-        cd ./data/spectra; wget -nv -r -nH --cut-dirs=8 -i
-        Chen_spec_list.txt -B
-        https:
-        //data.sdss.org/sas/dr16/eboss/spectro/redux/v5_13_0/spectra/lite/
-
-        Ignore error messages on Ubuntu if the download works""")
+        downloaded:""")
+        print('cd ./data/spectra; wget -nv -r -nH --cut-dirs=8 -i ', end='')
+        print('Chen_spec_list.txt -B ', end='')
+        print('https://data.sdss.org/sas/dr16/eboss/spectro/redux/', end='')
+        print('v5_13_0/spectra/lite/')
+        print('Ignore error messages on Ubuntu if the download works')
+        return ['Null'] * 8 # 'Return' so no error from the function call
     elif creating == 'Create dataframes':
         quasars = create_quasars()
         #pkl.dump([quasars], open(os.path.join(DATA_PATH,
