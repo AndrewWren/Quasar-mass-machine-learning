@@ -7,6 +7,7 @@ data/spectra/**
 data/test/**
 Issues.txt
 latex/**
+_Test_Quasar_mass_ML.ipynb
 
 !data/bigger_data/dummy.txt
 !data/bigger_data/quasars.parquet
